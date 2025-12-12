@@ -57,5 +57,3 @@ Built for seamless peer-to-peer interaction, secure authentication, and an engag
 - JWT + bcrypt  
 
 ---
-
-Feel free to ask if you want a **project banner**, **logo**, or **demo GIF section** added!
