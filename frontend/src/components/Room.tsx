@@ -4,7 +4,7 @@ import { Socket, io } from "socket.io-client";
 import { apiAddFriend, apiReport } from "../api";
 import "./Room.css";
 
-const URL = "http://localhost:3000";
+const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const EMOJI_LIST = [
     "😀","😂","😍","🤩","😎","🥳","🤪","😜",
