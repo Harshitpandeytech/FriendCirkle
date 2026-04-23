@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+// Removed useSearchParams
 import { Socket, io } from "socket.io-client";
 import { apiAddFriend, apiReport } from "../api";
 import "./Room.css";
@@ -43,14 +43,13 @@ export const Room = ({
     userCheckpoints?: string[],
     userId?: string,
 }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
     const [lobby, setLobby] = useState(true);
     const [socket, setSocket] = useState<null | Socket>(null);
-    const [sendingPc, setSendingPc] = useState<null | RTCPeerConnection>(null);
-    const [receivingPc, setReceivingPc] = useState<null | RTCPeerConnection>(null);
-    const [remoteVideoTrack, setRemoteVideoTrack] = useState<MediaStreamTrack | null>(null);
-    const [remoteAudioTrack, setRemoteAudioTrack] = useState<MediaStreamTrack | null>(null);
-    const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
+    const [, setSendingPc] = useState<null | RTCPeerConnection>(null);
+    const [, setReceivingPc] = useState<null | RTCPeerConnection>(null);
+    const [, setRemoteVideoTrack] = useState<MediaStreamTrack | null>(null);
+    const [, setRemoteAudioTrack] = useState<MediaStreamTrack | null>(null);
+    const [, setRemoteMediaStream] = useState<MediaStream | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>();
     const localVideoRef = useRef<HTMLVideoElement>();
 
@@ -175,7 +174,7 @@ export const Room = ({
             }, 5000)
         });
 
-        socket.on("answer", ({roomId, sdp: remoteSdp}) => {
+        socket.on("answer", ({ sdp: remoteSdp}) => {
             setLobby(false);
             setSendingPc(pc => {
                 pc?.setRemoteDescription(remoteSdp)

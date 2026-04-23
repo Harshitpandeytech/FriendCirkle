@@ -17,8 +17,6 @@ export const Profile = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [friends, setFriends] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const loadFriends = async () => {
             try {
@@ -26,8 +24,6 @@ export const Profile = () => {
                 setFriends(data);
             } catch {
                 // API might fail if no DB
-            } finally {
-                setLoading(false);
             }
         };
         loadFriends();

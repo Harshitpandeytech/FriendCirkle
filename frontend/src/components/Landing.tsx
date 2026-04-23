@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { PixelBackground } from "./PixelBackground";
