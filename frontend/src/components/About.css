@@ -1,0 +1,160 @@
+/* ===================================================
+   About Page — Retro Arcade Instruction Manual
+   =================================================== */
+
+.about-wrapper {
+  min-height: 100vh;
+  position: relative;
+  overflow-y: auto;
+  padding: var(--space-xl) var(--space-lg);
+  z-index: 2;
+}
+
+/* Background handled by PixelBackground component */
+
+.about-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  margin: 0 auto;
+  animation: pixel-fade-in 0.5s ease-out;
+}
+
+/* Nav back */
+.about-nav {
+  margin-bottom: var(--space-lg);
+}
+
+.about-back-btn {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--neon-cyan);
+  background: none;
+  border: 2px solid var(--neon-cyan);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.about-back-btn:hover {
+  background: rgba(0,255,245,0.08);
+  box-shadow: 0 0 10px rgba(0,255,245,0.2);
+}
+
+/* Hero */
+.about-hero {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.about-hero-title {
+  font-family: var(--font-pixel);
+  font-size: clamp(1rem, 4vw, 1.8rem);
+  margin-bottom: var(--space-sm);
+  line-height: 1.8;
+}
+
+.about-hero-title .title-friend { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
+.about-hero-title .title-cirkle { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
+
+.about-hero-sub {
+  font-family: var(--font-retro);
+  font-size: 1.5rem;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 6px var(--neon-yellow);
+}
+
+/* Sections */
+.about-section {
+  background: var(--bg-surface);
+  border: 4px solid var(--pixel-border);
+  box-shadow: inset -4px -4px 0 0 #0d0d1a, inset 4px 4px 0 0 #2a2a4a;
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.about-section-title {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: var(--neon-pink);
+  text-shadow: 0 0 6px var(--neon-pink);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  letter-spacing: 1px;
+}
+
+.about-section-title .section-icon { font-size: 1.2rem; }
+
+.about-text {
+  font-family: var(--font-retro);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+
+.about-text:last-child { margin-bottom: 0; }
+
+/* Feature list */
+.about-features {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.about-feature-item {
+  font-family: var(--font-retro);
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-left: 4px solid var(--neon-green);
+  background: rgba(57, 255, 20, 0.04);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.about-feature-item .feature-icon { font-size: 1.1rem; }
+
+/* Colleges List */
+.college-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-sm);
+}
+
+.college-chip {
+  font-family: var(--font-pixel);
+  font-size: 0.35rem;
+  padding: 10px;
+  border: 2px solid var(--pixel-border);
+  color: var(--neon-yellow);
+  text-align: center;
+  background: rgba(255, 230, 109, 0.04);
+  letter-spacing: 1px;
+}
+
+/* Comparison */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.comparison-table th, .comparison-table td {
+  font-family: var(--font-pixel);
+  font-size: 0.35rem;
+  padding: 10px;
+  border: 2px solid var(--pixel-border);
+  text-align: center;
+}
+.comparison-table th {
+  background: rgba(255, 110, 199, 0.1);
+  color: var(--neon-pink);
+}
+.comparison-table td {
+  color: var(--text-primary);
+}
+.comparison-table .yes { color: var(--neon-green); text-shadow: 0 0 4px var(--neon-green); }
+.comparison-table .no { color: var(--accent-primary); text-shadow: 0 0 4px var(--accent-primary); }

@@ -1,0 +1,273 @@
+/* ===================================================
+   Landing Page — 8-Bit Arcade Start Screen
+   =================================================== */
+
+/* ── Wrapper ── */
+.landing-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-lg);
+  z-index: 2;
+}
+
+/* Background handled by PixelBackground component */
+
+/* ── Content Card ── */
+.landing-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  animation: pixel-fade-in 0.6s ease-out;
+}
+
+/* ── Title ── */
+.landing-title {
+  font-family: var(--font-pixel);
+  font-size: clamp(1.2rem, 4vw, 2.4rem);
+  text-align: center;
+  animation: pulse-glow 2.5s infinite ease-in-out;
+  color: #fff;
+  line-height: 1.8;
+}
+
+.landing-title .title-friend {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+}
+.landing-title .title-cirkle {
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink), 0 0 30px var(--neon-pink);
+}
+
+.landing-subtitle {
+  font-family: var(--font-retro);
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  color: var(--neon-yellow);
+  text-shadow: 0 0 6px var(--neon-yellow);
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+/* ── CRT TV Frame for Camera Preview ── */
+.crt-tv-frame {
+  position: relative;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow:
+    0 0 0 6px #3a3a3a,
+    0 0 0 10px #222,
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.crt-tv-frame::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.crt-screen {
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  width: 320px;
+  height: 240px;
+  background: #000;
+}
+
+.crt-screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* CRT scanline overlay on camera */
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.08) 0px,
+    rgba(0, 0, 0, 0.08) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 2;
+}
+
+/* CRT glow reflection */
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 50px rgba(0, 255, 245, 0.08),
+    0 0 20px rgba(0, 255, 245, 0.12);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* TV stand bumps */
+.tv-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.tv-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #333;
+  border: 2px solid #555;
+}
+.tv-dot.active {
+  background: var(--neon-green);
+  box-shadow: 0 0 6px var(--neon-green);
+}
+
+/* ── Name Input Area ── */
+.name-input-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 360px;
+}
+
+.input-label {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--neon-green);
+  text-shadow: 0 0 6px var(--neon-green);
+  align-self: flex-start;
+  letter-spacing: 1px;
+}
+
+.input-label .cursor-blink {
+  animation: blink 0.8s step-end infinite;
+}
+
+/* ── Feature Pills ── */
+.feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+  max-width: 500px;
+}
+
+.feature-pill {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid var(--pixel-border);
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.3), inset 2px 2px 0 0 rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.feature-pill:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 245, 0.15);
+}
+
+.feature-pill .pill-icon {
+  font-size: 0.8rem;
+}
+
+/* ── Press Start Button ── */
+.start-btn-wrapper {
+  margin-top: var(--space-sm);
+}
+
+.press-start-text {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: var(--space-sm);
+  animation: blink 1.2s step-end infinite;
+}
+
+/* ── Camera Loading ── */
+.camera-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: var(--space-sm);
+}
+
+.camera-loading-text {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--neon-cyan);
+  animation: blink 1s step-end infinite;
+}
+
+.loading-bars {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  height: 24px;
+}
+
+.loading-bar {
+  width: 6px;
+  background: var(--neon-cyan);
+  animation: loading-bounce 1s infinite ease-in-out;
+}
+.loading-bar:nth-child(1) { height: 8px;  animation-delay: 0s; }
+.loading-bar:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+.loading-bar:nth-child(3) { height: 20px; animation-delay: 0.3s; }
+.loading-bar:nth-child(4) { height: 14px; animation-delay: 0.45s; }
+.loading-bar:nth-child(5) { height: 8px;  animation-delay: 0.6s; }
+
+@keyframes loading-bounce {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.4; }
+  50%      { transform: scaleY(1); opacity: 1; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .crt-screen {
+    width: 260px;
+    height: 195px;
+  }
+  .feature-pills {
+    flex-direction: column;
+    align-items: center;
+  }
+}
