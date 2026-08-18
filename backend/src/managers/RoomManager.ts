@@ -24,7 +24,7 @@ export class RoomManager {
             matchPercentage,
         })
 
-        // Send match info along with room assignment
+        // Only user1 creates the offer; user2 waits to receive it
         user1.socket.emit("send-offer", {
             roomId,
             matchInfo: {
@@ -35,7 +35,7 @@ export class RoomManager {
             }
         })
 
-        user2.socket.emit("send-offer", {
+        user2.socket.emit("waiting-for-offer", {
             roomId,
             matchInfo: {
                 peerName: user1.name,

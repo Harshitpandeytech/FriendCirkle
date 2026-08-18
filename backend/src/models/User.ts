@@ -28,7 +28,6 @@ export const ALLOWED_DOMAINS = [
     "cumail.in",
     "iiita.ac.in",
     "mmmut.ac.in",
-    
 ];
 
 // Mapping domain to college name

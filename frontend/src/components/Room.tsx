@@ -74,14 +74,58 @@ export const Room = ({
     useEffect(() => {
         const socket = io(URL);
 
+        // ICE servers for NAT traversal (needed when users are on different networks)
+        const iceServers: RTCConfiguration = {
+            iceServers: [
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:stun1.l.google.com:19302" },
+                { urls: "stun:stun2.l.google.com:19302" },
+                {
+                    urls: "turn:openrelay.metered.ca:80",
+                    username: "openrelayproject",
+                    credential: "openrelayproject",
+                },
+                {
+                    urls: "turn:openrelay.metered.ca:443",
+                    username: "openrelayproject",
+                    credential: "openrelayproject",
+                },
+            ],
+        };
+
+        // Helper: set up remote stream on a peer connection
+        const setupRemoteStream = (pc: RTCPeerConnection) => {
+            const stream = new MediaStream();
+            if (remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = stream;
+            }
+            setRemoteMediaStream(stream);
+
+            pc.ontrack = (event) => {
+                console.log("ontrack fired:", event.track.kind);
+                stream.addTrack(event.track);
+                if (event.track.kind === "video") {
+                    setRemoteVideoTrack(event.track);
+                } else {
+                    setRemoteAudioTrack(event.track);
+                }
+                // Ensure video plays
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = stream;
+                    remoteVideoRef.current.play().catch(console.error);
+                }
+            };
+        };
+
         socket.emit("join", {
             name,
             userId,
             checkpoints: userCheckpoints || [],
         });
 
+        // --- OFFERER: This user creates and sends the offer ---
         socket.on('send-offer', async ({roomId, matchInfo: mi}) => {
-            console.log("sending offer");
+            console.log("I am the offerer, sending offer");
             setLobby(false);
             setCurrentRoomId(roomId);
             if (mi) setMatchInfo(mi);
@@ -91,114 +135,123 @@ export const Room = ({
                 addSystemMessage(`Vibe Match: ${mi.matchPercentage}% — You both like: ${mi.sharedCheckpoints.join(", ")}`);
             }
 
-            const pc = new RTCPeerConnection();
+            const pc = new RTCPeerConnection(iceServers);
             setSendingPc(pc);
+
+            // Set up to receive remote tracks from the answerer
+            setupRemoteStream(pc);
+
+            // Add local tracks
             if (localVideoTrack) {
-                pc.addTrack(localVideoTrack)
+                pc.addTrack(localVideoTrack);
             }
             if (localAudioTrack) {
-                pc.addTrack(localAudioTrack)
+                pc.addTrack(localAudioTrack);
             }
 
-            pc.onicecandidate = async (e) => {
+            pc.onicecandidate = (e) => {
                 if (e.candidate) {
-                   socket.emit("add-ice-candidate", {
-                    candidate: e.candidate,
-                    type: "sender",
-                    roomId
-                   })
+                    socket.emit("add-ice-candidate", {
+                        candidate: e.candidate,
+                        type: "sender",
+                        roomId,
+                    });
                 }
-            }
+            };
 
             pc.onnegotiationneeded = async () => {
+                console.log("negotiation needed, creating offer");
                 const sdp = await pc.createOffer();
-                //@ts-ignore
-                pc.setLocalDescription(sdp)
+                await pc.setLocalDescription(sdp);
                 socket.emit("offer", {
                     sdp,
-                    roomId
-                })
+                    roomId,
+                });
+            };
+        });
+
+        // --- ANSWERER (waiting-for-offer): Just store match info, no PC yet ---
+        socket.on('waiting-for-offer', ({matchInfo: mi}) => {
+            console.log("I am the answerer, waiting for offer");
+            setLobby(false);
+            if (mi) setMatchInfo(mi);
+
+            addSystemMessage("Connected! Say hi");
+            if (mi?.sharedCheckpoints?.length > 0) {
+                addSystemMessage(`Vibe Match: ${mi.matchPercentage}% — You both like: ${mi.sharedCheckpoints.join(", ")}`);
             }
         });
 
+        // --- Receive offer (only the answerer gets this) ---
         socket.on("offer", async ({roomId, sdp: remoteSdp}) => {
+            console.log("Received offer, creating answer");
             setLobby(false);
             setCurrentRoomId(roomId);
-            addSystemMessage("Connected! Say hi");
 
-            const pc = new RTCPeerConnection();
-            pc.setRemoteDescription(remoteSdp)
-            const sdp = await pc.createAnswer();
-            //@ts-ignore
-            pc.setLocalDescription(sdp)
-            const stream = new MediaStream();
-            if (remoteVideoRef.current) {
-                remoteVideoRef.current.srcObject = stream;
-            }
-
-            setRemoteMediaStream(stream);
+            const pc = new RTCPeerConnection(iceServers);
             setReceivingPc(pc);
-            // @ts-ignore
-            window.pcr = pc;
-            pc.ontrack = () => {};
 
-            pc.onicecandidate = async (e) => {
-                if (!e.candidate) return;
-                if (e.candidate) {
-                   socket.emit("add-ice-candidate", {
-                    candidate: e.candidate,
-                    type: "receiver",
-                    roomId
-                   })
-                }
+            // Set up to receive remote tracks from the offerer
+            setupRemoteStream(pc);
+
+            // Add local tracks so the offerer can see/hear us
+            if (localVideoTrack) {
+                pc.addTrack(localVideoTrack);
+            }
+            if (localAudioTrack) {
+                pc.addTrack(localAudioTrack);
             }
 
-            socket.emit("answer", { roomId, sdp: sdp });
+            await pc.setRemoteDescription(new RTCSessionDescription(remoteSdp));
+            const sdp = await pc.createAnswer();
+            await pc.setLocalDescription(sdp);
 
-            setTimeout(() => {
-                const track1 = pc.getTransceivers()[0].receiver.track
-                const track2 = pc.getTransceivers()[1].receiver.track
-                if (track1.kind === "video") {
-                    setRemoteAudioTrack(track2)
-                    setRemoteVideoTrack(track1)
-                } else {
-                    setRemoteAudioTrack(track1)
-                    setRemoteVideoTrack(track2)
+            pc.onicecandidate = (e) => {
+                if (e.candidate) {
+                    socket.emit("add-ice-candidate", {
+                        candidate: e.candidate,
+                        type: "receiver",
+                        roomId,
+                    });
                 }
-                //@ts-ignore
-                remoteVideoRef.current.srcObject.addTrack(track1)
-                //@ts-ignore
-                remoteVideoRef.current.srcObject.addTrack(track2)
-                //@ts-ignore
-                remoteVideoRef.current.play();
-            }, 5000)
+            };
+
+            socket.emit("answer", { roomId, sdp });
         });
 
-        socket.on("answer", ({ sdp: remoteSdp}) => {
+        // --- Offerer receives the answer ---
+        socket.on("answer", ({ sdp: remoteSdp }) => {
+            console.log("Received answer, setting remote description");
             setLobby(false);
             setSendingPc(pc => {
-                pc?.setRemoteDescription(remoteSdp)
+                if (pc) {
+                    pc.setRemoteDescription(new RTCSessionDescription(remoteSdp)).catch(console.error);
+                }
                 return pc;
             });
-        })
+        });
 
         socket.on("lobby", () => {
             setLobby(true);
-        })
+        });
 
         socket.on("add-ice-candidate", ({candidate, type}) => {
-            if (type == "sender") {
+            if (type === "sender") {
                 setReceivingPc(pc => {
-                    pc?.addIceCandidate(candidate)
+                    if (pc) {
+                        pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+                    }
                     return pc;
                 });
             } else {
                 setSendingPc(pc => {
-                    pc?.addIceCandidate(candidate)
+                    if (pc) {
+                        pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+                    }
                     return pc;
                 });
             }
-        })
+        });
 
         socket.on("chat-message", ({ sender, text }: { sender: string, text: string }) => {
             const msg: ChatMessage = {
@@ -211,7 +264,7 @@ export const Room = ({
             setMessages(prev => [...prev, msg]);
         });
 
-        setSocket(socket)
+        setSocket(socket);
 
         return () => {
             socket.disconnect();
