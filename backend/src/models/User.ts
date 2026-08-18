@@ -27,6 +27,8 @@ export const ALLOWED_DOMAINS = [
     "galgotiasuniversity.edu.in",
     "cumail.in",
     "iiita.ac.in",
+    "mmmut.ac.in",
+    
 ];
 
 // Mapping domain to college name
@@ -41,6 +43,7 @@ export const COLLEGE_NAMES: Record<string, string> = {
     "galgotiasuniversity.edu.in": "Galgotias University",
     "cumail.in": "Chandigarh University",
     "iiita.ac.in": "IIIT Allahabad",
+    "mmmut.ac.in": "MMMUT Gorakhpur",
 };
 
 // All available checkpoint tags
